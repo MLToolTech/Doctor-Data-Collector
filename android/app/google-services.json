@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "919715651055",
+    "firebase_url": "https://doctorapp-ddd41.firebaseio.com",
+    "project_id": "doctorapp-ddd41",
+    "storage_bucket": "doctorapp-ddd41.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:919715651055:android:3f6c926e7433bc6fd26a1a",
+        "android_client_info": {
+          "package_name": "com.baiosbay.doc_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "919715651055-kakv89kp59t7nu92i03sdj5hi30ft7f1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBwkYqL3qCSK-3Ut2F7k-b3nV-veooFqc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "919715651055-kakv89kp59t7nu92i03sdj5hi30ft7f1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
