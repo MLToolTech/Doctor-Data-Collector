@@ -147,7 +147,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       if (_checkBoxValue) {
                         await localDataStorage();
                       }
-                      Navigator.pushNamed(context, HomeScreen.id);
+                      Navigator.pushReplacementNamed(context, HomeScreen.id);
                     }
                     setState(() {
                       showSpinner = false;

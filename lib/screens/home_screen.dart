@@ -1,3 +1,4 @@
+import 'package:doc_app/screens/login_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   var _patientPhoneNo;
   var _patientNameController = TextEditingController();
   var _patientPhoneController = TextEditingController();
+  List<dynamic> patientArray = [];
 
   @override
   void initState() {
@@ -42,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           uId = user;
           loggedInUser = user.email.toString();
+          getPatient();
           //print(loggedInUser);
         });
         getPhotoFirebase();
@@ -95,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           ])
         });
+        await getPatient();
         return;
       }
       await databaseReference.collection("patient").document(uId.uid).setData({
@@ -105,9 +109,25 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         ])
       });
+      await getPatient();
     } catch (e) {
       print(e);
     }
+  }
+
+  Future getPatient() async {
+    await databaseReference
+        .collection('patient')
+        .document(uId.uid)
+        .get()
+        .then((DocumentSnapshot ds) {
+      setState(() {
+        patientArray = ds.data['patient'];
+      });
+
+      //print(patientArray);
+      //print(patientArray.length);
+    });
   }
 
   Future<void> _neverSatisfied() async {
@@ -183,116 +203,95 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () => Future.value(false),
-      child: Scaffold(
-        appBar: AppBar(title: Text('Home')),
-        body: Column(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Home'),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.ac_unit), onPressed: getPatient),
+        ],
+      ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: ListView.builder(
+              itemBuilder: (context, position) {
+                return Card(
+                  child: ListTile(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  PatientDetails(clickPosition: position)));
+                    },
+                    leading: Icon(Icons.person),
+                    title: Text(patientArray[position]['patientName']),
+                    subtitle: Text(patientArray[position]['phoneNo']),
+                  ),
+                );
+              },
+              itemCount: patientArray.length,
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _neverSatisfied();
+        },
+        child: Icon(Icons.add),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: <Widget>[
-            StreamWidget(),
+            DrawerHeader(
+              child: Column(
+                children: <Widget>[
+                  Flexible(
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(_uploadedFileURL ?? uri),
+                      backgroundColor: Colors.white,
+                      child: Text(''),
+                      radius: 40.0,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Text(loggedInUser),
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              title: Text('Profile'),
+              leading: Icon(Icons.person),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, ProfileScreen.id);
+              },
+            ),
+            Divider(
+              color: Colors.grey,
+              height: 10.0,
+              indent: 5.0,
+              endIndent: 5.0,
+            ),
+            ListTile(
+              title: Text('Logout'),
+              leading: Icon(Icons.cancel),
+              onTap: () {
+                _auth.signOut();
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, LoginScreen.id);
+              },
+            ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            _neverSatisfied();
-          },
-          child: Icon(Icons.add),
-        ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              DrawerHeader(
-                child: Column(
-                  children: <Widget>[
-                    Flexible(
-                      child: CircleAvatar(
-                        backgroundImage: NetworkImage(_uploadedFileURL ?? uri),
-                        backgroundColor: Colors.white,
-                        child: Text(''),
-                        radius: 40.0,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    Text(loggedInUser),
-                  ],
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-              ),
-              ListTile(
-                title: Text('Profile'),
-                leading: Icon(Icons.person),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, ProfileScreen.id);
-                },
-              ),
-              Divider(
-                color: Colors.grey,
-                height: 10.0,
-                indent: 5.0,
-                endIndent: 5.0,
-              ),
-              ListTile(
-                title: Text('Logout'),
-                leading: Icon(Icons.cancel),
-                onTap: () {
-                  _auth.signOut();
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        ),
       ),
-    );
-  }
-}
-
-class StreamWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: databaseReference.collection('patient').snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Center(
-            child: Text('No Patient added'),
-          );
-        }
-
-        final patientData = snapshot.data.documents;
-        dynamic firData;
-        for (var i in patientData) {
-          firData = i.data['patient'];
-        }
-        return Expanded(
-          child: ListView.builder(
-            itemBuilder: (context, position) {
-              return Card(
-                child: ListTile(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                PatientDetails(clickPosition: position)));
-                  },
-                  leading: Icon(Icons.person),
-                  title: Text(firData[position]['patientName']),
-                  subtitle: Text(firData[position]['phoneNo']),
-                ),
-              );
-            },
-            itemCount: firData.length,
-          ),
-        );
-      },
     );
   }
 }

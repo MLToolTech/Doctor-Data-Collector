@@ -80,12 +80,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     final user = await _auth.signInWithEmailAndPassword(
                         email: email, password: password);
                     if (user != null) {
-                      Navigator.pushNamed(context, HomeScreen.id);
+                      Navigator.pushReplacementNamed(context, HomeScreen.id);
                     }
                     setState(() {
                       showSpinner = false;
                     });
                   } catch (e) {
+                    setState(() {
+                      showSpinner = false;
+                    });
                     print(e);
                     _exception = e.toString().split(',')[1].split('.')[0];
                     Flushbar(
@@ -93,9 +96,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       message: _exception,
                       duration: Duration(seconds: 3),
                     ).show(context);
-                    setState(() {
-                      showSpinner = false;
-                    });
                   }
                 },
                 title: 'Log In',

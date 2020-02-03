@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as Path;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:photo_view/photo_view.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class PatientDetails extends StatefulWidget {
   PatientDetails({@required this.clickPosition});
@@ -53,7 +53,7 @@ class _PatientDetailsState extends State<PatientDetails> {
   Future _getImage() async {
     try {
       var image = await ImagePicker.pickImage(
-          source: ImageSource.camera, imageQuality: 50);
+          source: ImageSource.camera, imageQuality: 20);
       setState(() {
         _image = image;
       });
@@ -208,9 +208,16 @@ class _PatientDetailsState extends State<PatientDetails> {
                   children: List<Container>.generate(_uploadedFileURL.length,
                       (int index) {
                     return Container(
-                      child: Image.network(
-                        _uploadedFileURL[index],
-                        fit: BoxFit.cover,
+                      child: Stack(
+                        children: <Widget>[
+                          Center(child: CircularProgressIndicator()),
+                          Center(
+                            child: FadeInImage.memoryNetwork(
+                              placeholder: kTransparentImage,
+                              image: _uploadedFileURL[index],
+                            ),
+                          )
+                        ],
                       ),
                     );
                   })),
