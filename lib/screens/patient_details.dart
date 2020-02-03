@@ -209,13 +209,13 @@ class _PatientDetailsState extends State<PatientDetails> {
                       (int index) {
                     return Container(
                       child: Stack(
+                        fit: StackFit.expand,
                         children: <Widget>[
                           Center(child: CircularProgressIndicator()),
-                          Center(
-                            child: FadeInImage.memoryNetwork(
-                              placeholder: kTransparentImage,
-                              image: _uploadedFileURL[index],
-                            ),
+                          FadeInImage.memoryNetwork(
+                            placeholder: kTransparentImage,
+                            image: _uploadedFileURL[index],
+                            fit: BoxFit.fitWidth,
                           )
                         ],
                       ),
