@@ -184,14 +184,6 @@ class _PatientDetailsState extends State<PatientDetails> {
       appBar: AppBar(
         title: Text('Patient Details'),
         centerTitle: true,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.ac_unit),
-            onPressed: () {
-              //imagesStream(context);
-            },
-          )
-        ],
       ),
       body: ModalProgressHUD(
         inAsyncCall: showSpinner,

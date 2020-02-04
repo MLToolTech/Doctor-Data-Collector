@@ -13,6 +13,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primaryColor: Color(0xFFff1744),
+        accentColor: Colors.redAccent,
+      ),
       initialRoute: SlashScreen.id,
       routes: {
         SlashScreen.id: (context) => SlashScreen(),

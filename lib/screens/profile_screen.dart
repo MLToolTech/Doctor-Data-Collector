@@ -169,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w300,
-                          color: Colors.lightBlue),
+                          color: Color(0xFFff1744)),
                     ),
                   ),
                   SizedBox(
@@ -196,7 +196,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Text(
                             "Edit",
                             style: TextStyle(
-                              color: Colors.lightBlue,
+                              color: Color(0xFFff1744),
                               fontSize: 20,
                               fontWeight: FontWeight.w300,
                             ),
@@ -280,7 +280,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       });
                     },
                     child: Text('Save'),
-                    color: Colors.lightBlueAccent,
+                    color: Colors.redAccent,
                   )
                 ],
               ),

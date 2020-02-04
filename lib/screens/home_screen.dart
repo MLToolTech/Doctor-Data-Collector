@@ -177,7 +177,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             actions: <Widget>[
               FlatButton(
-                child: Text('Add'),
+                child: Text(
+                  'Add',
+                  style: TextStyle(
+                    color: Color(0xFFff1744),
+                  ),
+                ),
                 onPressed: () {
                   setState(() {
                     if (_patientNameController.text.isEmpty) {
@@ -203,95 +208,104 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Home'),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.ac_unit), onPressed: getPatient),
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: ListView.builder(
-              itemBuilder: (context, position) {
-                return Card(
-                  child: ListTile(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  PatientDetails(clickPosition: position)));
-                    },
-                    leading: Icon(Icons.person),
-                    title: Text(patientArray[position]['patientName']),
-                    subtitle: Text(patientArray[position]['phoneNo']),
-                  ),
-                );
-              },
-              itemCount: patientArray.length,
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _neverSatisfied();
-        },
-        child: Icon(Icons.add),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
+    if (patientArray.length == 0) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Home'),
+        ),
+        body: SafeArea(
+            child: Center(
+          child: Text('No pateint'),
+        )),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Home'),
+        ),
+        body: Column(
           children: <Widget>[
-            DrawerHeader(
-              child: Column(
-                children: <Widget>[
-                  Flexible(
-                    child: CircleAvatar(
-                      backgroundImage: NetworkImage(_uploadedFileURL ?? uri),
-                      backgroundColor: Colors.white,
-                      child: Text(''),
-                      radius: 40.0,
+            Expanded(
+              child: ListView.builder(
+                itemBuilder: (context, position) {
+                  return Card(
+                    child: ListTile(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    PatientDetails(clickPosition: position)));
+                      },
+                      leading: Icon(Icons.person),
+                      title: Text(patientArray[position]['patientName']),
+                      subtitle: Text(patientArray[position]['phoneNo']),
                     ),
-                  ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  Text(loggedInUser),
-                ],
+                  );
+                },
+                itemCount: patientArray.length,
               ),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-            ),
-            ListTile(
-              title: Text('Profile'),
-              leading: Icon(Icons.person),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, ProfileScreen.id);
-              },
-            ),
-            Divider(
-              color: Colors.grey,
-              height: 10.0,
-              indent: 5.0,
-              endIndent: 5.0,
-            ),
-            ListTile(
-              title: Text('Logout'),
-              leading: Icon(Icons.cancel),
-              onTap: () {
-                _auth.signOut();
-                Navigator.pop(context);
-                Navigator.pushReplacementNamed(context, LoginScreen.id);
-              },
             ),
           ],
         ),
-      ),
-    );
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            _neverSatisfied();
+          },
+          child: Icon(Icons.add),
+        ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                child: Column(
+                  children: <Widget>[
+                    Flexible(
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(_uploadedFileURL ?? uri),
+                        backgroundColor: Colors.white,
+                        child: Text(''),
+                        radius: 40.0,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Text(loggedInUser),
+                  ],
+                ),
+                decoration: BoxDecoration(
+                  color: Color(0xFFff1744),
+                ),
+              ),
+              ListTile(
+                title: Text('Profile'),
+                leading: Icon(Icons.person),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, ProfileScreen.id);
+                },
+              ),
+              Divider(
+                color: Colors.grey,
+                height: 10.0,
+                indent: 5.0,
+                endIndent: 5.0,
+              ),
+              ListTile(
+                title: Text('Logout'),
+                leading: Icon(Icons.cancel),
+                onTap: () {
+                  _auth.signOut();
+                  Navigator.pop(context);
+                  Navigator.pushReplacementNamed(context, LoginScreen.id);
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 }
