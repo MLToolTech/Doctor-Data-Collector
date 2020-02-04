@@ -180,50 +180,62 @@ class _PatientDetailsState extends State<PatientDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Patient Details'),
-        centerTitle: true,
-      ),
-      body: ModalProgressHUD(
-        inAsyncCall: showSpinner,
-        opacity: 0.8,
-        child: Column(
-          children: <Widget>[
-            Flexible(
-              child: GridView.extent(
-                  maxCrossAxisExtent: 200.0,
-                  mainAxisSpacing: 5.0,
-                  crossAxisSpacing: 5.0,
-                  addAutomaticKeepAlives: true,
-                  padding: EdgeInsets.all(5.0),
-                  children: List<Container>.generate(_uploadedFileURL.length,
-                      (int index) {
-                    return Container(
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: <Widget>[
-                          Center(child: CircularProgressIndicator()),
-                          FadeInImage.memoryNetwork(
-                            placeholder: kTransparentImage,
-                            image: _uploadedFileURL[index],
-                            fit: BoxFit.fitWidth,
-                          )
-                        ],
-                      ),
-                    );
-                  })),
-            ),
-          ],
+    if (_uploadedFileURL.length == 0) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Patient Details'),
+          centerTitle: true,
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          _getImage();
-        },
-        label: Text('Add Photo'),
-        icon: Icon(Icons.photo_camera),
-      ),
-    );
+        body: Center(
+          child: Text('No image added'),
+        ),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Patient Details'),
+          centerTitle: true,
+        ),
+        body: ModalProgressHUD(
+          inAsyncCall: showSpinner,
+          opacity: 0.8,
+          child: Column(
+            children: <Widget>[
+              Flexible(
+                child: GridView.extent(
+                    maxCrossAxisExtent: 200.0,
+                    mainAxisSpacing: 5.0,
+                    crossAxisSpacing: 5.0,
+                    addAutomaticKeepAlives: true,
+                    padding: EdgeInsets.all(5.0),
+                    children: List<Container>.generate(_uploadedFileURL.length,
+                        (int index) {
+                      return Container(
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: <Widget>[
+                            Center(child: CircularProgressIndicator()),
+                            FadeInImage.memoryNetwork(
+                              placeholder: kTransparentImage,
+                              image: _uploadedFileURL[index],
+                              fit: BoxFit.fitWidth,
+                            )
+                          ],
+                        ),
+                      );
+                    })),
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            _getImage();
+          },
+          label: Text('Add Photo'),
+          icon: Icon(Icons.photo_camera),
+        ),
+      );
+    }
   }
 }
