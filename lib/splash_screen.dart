@@ -33,7 +33,7 @@ class _SlashScreenState extends State<SlashScreen> {
   void getUser() async {
     final user = await _auth.currentUser();
     if (user != null) {
-      Navigator.pushNamed(context, HomeScreen.id);
+      Navigator.pushReplacementNamed(context, HomeScreen.id);
     } else {
       startTime();
     }
@@ -42,8 +42,13 @@ class _SlashScreenState extends State<SlashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Image.asset('assets/icon.png'),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Center(
+            child: Image.asset('assets/icon.png'),
+          ),
+        ),
       ),
     );
   }

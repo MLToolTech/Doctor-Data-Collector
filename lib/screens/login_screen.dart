@@ -99,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
                 },
                 title: 'Log In',
-                colour: Colors.lightBlueAccent,
+                colour: Colors.redAccent,
               ),
             ],
           ),

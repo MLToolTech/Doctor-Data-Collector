@@ -40,8 +40,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final storage = FlutterSecureStorage();
-//    String prefEmail = prefs.getString('usernamePref');
-//    String prefPassword = prefs.getString('passwordPef');
       String storageEmail = await storage.read(key: 'usernamePref');
       String storagePassword = await storage.read(key: 'passwordPef');
       bool prefCheck = prefs.getBool('checkBoxStatus');
@@ -166,7 +164,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   }
                 },
                 title: 'Register',
-                colour: Colors.blueAccent,
+                colour: Color(0xFFff1744),
               ),
             ],
           ),

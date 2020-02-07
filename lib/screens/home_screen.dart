@@ -7,6 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as Path;
 import 'package:doc_app/screens/patient_details.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 
 final databaseReference = Firestore.instance;
 
@@ -29,12 +31,24 @@ class _HomeScreenState extends State<HomeScreen> {
   var _patientNameController = TextEditingController();
   var _patientPhoneController = TextEditingController();
   List<dynamic> patientArray = [];
+  bool _showSpinner = false;
+  dynamic imgUrl;
 
   @override
   void initState() {
     super.initState();
+    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+    myBanner
+      ..load()
+      ..show();
     _getCurrentUser();
 //    _getPatientInfo();
+  }
+
+  @override
+  void dispose() {
+    myBanner.dispose();
+    super.dispose();
   }
 
   void _getCurrentUser() async {
@@ -83,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future _createRecord() async {
     try {
+      _showSpinner = true;
       DocumentReference docref =
           databaseReference.collection("patient").document(uId.uid);
       DocumentSnapshot docSnap = await docref.get();
@@ -110,24 +125,31 @@ class _HomeScreenState extends State<HomeScreen> {
         ])
       });
       await getPatient();
+      _showSpinner = false;
     } catch (e) {
+      _showSpinner = false;
       print(e);
     }
   }
 
   Future getPatient() async {
-    await databaseReference
-        .collection('patient')
-        .document(uId.uid)
-        .get()
-        .then((DocumentSnapshot ds) {
-      setState(() {
-        patientArray = ds.data['patient'];
-      });
+    try {
+      await databaseReference
+          .collection('patient')
+          .document(uId.uid)
+          .get()
+          .then((DocumentSnapshot ds) {
+        setState(() {
+          patientArray = List<dynamic>.from(ds.data['patient']);
+        });
 
-      //print(patientArray);
-      //print(patientArray.length);
-    });
+        //print(patientArray);
+        //print(patientArray.length);
+      });
+    } catch (e) {
+      _showSpinner = false;
+      print(e);
+    }
   }
 
   Future<void> _neverSatisfied() async {
@@ -206,106 +228,189 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Future _getImageUrl(int pos) async {
+    await databaseReference
+        .collection('patientImages')
+        .document(uId.uid)
+        .get()
+        .then((DocumentSnapshot ds) {
+      // print(ds.data);
+      imgUrl = List<dynamic>.from(ds.data['$pos']);
+      //print(firImageData);
+    });
+  }
+
+  void deletePatient(int pos) async {
+    try {
+      _showSpinner = true;
+      _getImageUrl(pos);
+      await databaseReference
+          .collection("patient")
+          .document(uId.uid)
+          .updateData({
+        'patient': FieldValue.arrayRemove([
+          {
+            'patientName': patientArray[pos]['patientName'],
+            'phoneNo': patientArray[pos]['phoneNo'],
+          }
+        ])
+      });
+      setState(() {
+        patientArray.removeAt(pos);
+      });
+      // delete images
+      await databaseReference
+          .collection("patientImages")
+          .document(uId.uid)
+          .updateData({
+        pos.toString(): FieldValue.delete(),
+      });
+      // delete firstorage photos
+      for (int i = 0; i < imgUrl.length; i++) {
+        StorageReference storageReference = FirebaseStorage.instance
+            .ref()
+            .child('patientImages/${Path.basename(imgUrl[pos])}');
+        await storageReference.delete();
+      }
+      _showSpinner = false;
+    } catch (e) {
+      _showSpinner = false;
+      print('dsfsdfs $e');
+    }
+  }
+
+  Widget bodyOfScreen() {
     if (patientArray.length == 0) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Home'),
-        ),
-        body: SafeArea(
-            child: Center(
-          child: Text('No pateint'),
-        )),
+      return Center(
+        child: Text('No patient'),
       );
     } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Home'),
-        ),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: ListView.builder(
-                itemBuilder: (context, position) {
-                  return Card(
-                    child: ListTile(
+      return Column(
+        children: <Widget>[
+          Expanded(
+            child: ListView.builder(
+              itemBuilder: (context, position) {
+                return Card(
+                  elevation: 5.0,
+                  child: ListTile(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  PatientDetails(clickPosition: position)));
+                    },
+                    leading: Icon(Icons.person),
+                    title: Text(patientArray[position]['patientName']),
+                    subtitle: Text(patientArray[position]['phoneNo']),
+                    trailing: GestureDetector(
+                      child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10.0, horizontal: 10.0),
+                          child: Icon(Icons.delete_forever)),
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    PatientDetails(clickPosition: position)));
+                        deletePatient(position);
+                        _showSpinner = false;
                       },
-                      leading: Icon(Icons.person),
-                      title: Text(patientArray[position]['patientName']),
-                      subtitle: Text(patientArray[position]['phoneNo']),
                     ),
-                  );
-                },
-                itemCount: patientArray.length,
-              ),
+                  ),
+                );
+              },
+              itemCount: patientArray.length,
             ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
+          ),
+        ],
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Home'),
+      ),
+      body: ModalProgressHUD(
+        inAsyncCall: _showSpinner,
+        child: bodyOfScreen(),
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 50.0, right: 0.0),
+        child: FloatingActionButton(
+          backgroundColor: Color(0xFFff1744),
           onPressed: () {
             _neverSatisfied();
           },
           child: Icon(Icons.add),
         ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              DrawerHeader(
-                child: Column(
-                  children: <Widget>[
-                    Flexible(
-                      child: CircleAvatar(
-                        backgroundImage: NetworkImage(_uploadedFileURL ?? uri),
-                        backgroundColor: Colors.white,
-                        child: Text(''),
-                        radius: 40.0,
-                      ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Column(
+                children: <Widget>[
+                  Flexible(
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(_uploadedFileURL ?? uri),
+                      backgroundColor: Colors.white,
+                      child: Text(''),
+                      radius: 40.0,
                     ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    Text(loggedInUser),
-                  ],
-                ),
-                decoration: BoxDecoration(
-                  color: Color(0xFFff1744),
-                ),
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Text(loggedInUser),
+                ],
               ),
-              ListTile(
-                title: Text('Profile'),
-                leading: Icon(Icons.person),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, ProfileScreen.id);
-                },
+              decoration: BoxDecoration(
+                color: Color(0xFFff1744),
               ),
-              Divider(
-                color: Colors.grey,
-                height: 10.0,
-                indent: 5.0,
-                endIndent: 5.0,
-              ),
-              ListTile(
-                title: Text('Logout'),
-                leading: Icon(Icons.cancel),
-                onTap: () {
-                  _auth.signOut();
-                  Navigator.pop(context);
-                  Navigator.pushReplacementNamed(context, LoginScreen.id);
-                },
-              ),
-            ],
-          ),
+            ),
+            ListTile(
+              title: Text('Profile'),
+              leading: Icon(Icons.person),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, ProfileScreen.id);
+              },
+            ),
+            Divider(
+              color: Colors.grey,
+              height: 10.0,
+              indent: 5.0,
+              endIndent: 5.0,
+            ),
+            ListTile(
+              title: Text('Logout'),
+              leading: Icon(Icons.cancel),
+              onTap: () {
+                _auth.signOut();
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, LoginScreen.id);
+              },
+            ),
+          ],
         ),
-      );
-    }
+      ),
+    );
   }
 }
+// banner ads
+
+MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+  keywords: <String>['Medical', 'Doctor'],
+  childDirected: false, // or MobileAdGender.female, MobileAdGender.unknown
+  testDevices: <String>[], // Android emulators are considered test devices
+);
+
+BannerAd myBanner = BannerAd(
+  adUnitId: BannerAd.testAdUnitId,
+  size: AdSize.banner,
+  targetingInfo: targetingInfo,
+  listener: (MobileAdEvent event) {
+    print("BannerAd event is $event");
+  },
+);

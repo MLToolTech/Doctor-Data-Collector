@@ -119,7 +119,7 @@ class _PatientDetailsState extends State<PatientDetails> {
         .get()
         .then((DocumentSnapshot ds) {
       // print(ds.data);
-      firImageData = ds.data['${widget.clickPosition}'];
+      firImageData = List<dynamic>.from(ds.data['${widget.clickPosition}']);
       //print(firImageData);
     });
   }
@@ -133,7 +133,7 @@ class _PatientDetailsState extends State<PatientDetails> {
         StorageReference storageReference = FirebaseStorage.instance
             .ref()
             .child('patientImages/${Path.basename(firImageData[i])}');
-        storageReference.getDownloadURL().then((fileURL) {
+        await storageReference.getDownloadURL().then((fileURL) {
           if (this.mounted) {
             setState(() {
               _uploadedFileURL.add(fileURL);
@@ -141,7 +141,7 @@ class _PatientDetailsState extends State<PatientDetails> {
           }
         });
       }
-      //print(firImageData.length);
+      //print(_uploadedFileURL);
     } catch (e) {
       showSpinner = false;
       print(e);
@@ -178,64 +178,98 @@ class _PatientDetailsState extends State<PatientDetails> {
     }
   }*/
 
-  @override
-  Widget build(BuildContext context) {
+  void _deletePhotos(int pos) async {
+    try {
+      showSpinner = true;
+      await _databaseReference
+          .collection("patientImages")
+          .document(uId.uid)
+          .updateData({
+        widget.clickPosition.toString():
+            FieldValue.arrayRemove([firImageData[pos]]),
+      });
+      setState(() {
+        _uploadedFileURL.removeAt(pos);
+      });
+      // delete firstorage photos
+      StorageReference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('patientImages/${Path.basename(firImageData[pos])}');
+      await storageReference.delete();
+      showSpinner = false;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Widget _getBody() {
     if (_uploadedFileURL.length == 0) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Patient Details'),
-          centerTitle: true,
-        ),
-        body: Center(
-          child: Text('No image added'),
-        ),
+      return Center(
+        child: Text('No images'),
       );
     } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Patient Details'),
-          centerTitle: true,
-        ),
-        body: ModalProgressHUD(
-          inAsyncCall: showSpinner,
-          opacity: 0.8,
-          child: Column(
-            children: <Widget>[
-              Flexible(
-                child: GridView.extent(
-                    maxCrossAxisExtent: 200.0,
-                    mainAxisSpacing: 5.0,
-                    crossAxisSpacing: 5.0,
-                    addAutomaticKeepAlives: true,
-                    padding: EdgeInsets.all(5.0),
-                    children: List<Container>.generate(_uploadedFileURL.length,
-                        (int index) {
-                      return Container(
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: <Widget>[
-                            Center(child: CircularProgressIndicator()),
-                            FadeInImage.memoryNetwork(
-                              placeholder: kTransparentImage,
-                              image: _uploadedFileURL[index],
-                              fit: BoxFit.fitWidth,
-                            )
-                          ],
-                        ),
-                      );
-                    })),
-              ),
-            ],
+      return Column(
+        children: <Widget>[
+          Flexible(
+            child: GridView.extent(
+                maxCrossAxisExtent: 200.0,
+                mainAxisSpacing: 5.0,
+                crossAxisSpacing: 5.0,
+                addAutomaticKeepAlives: true,
+                padding: EdgeInsets.all(5.0),
+                children: List<Container>.generate(_uploadedFileURL.length,
+                    (int index) {
+                  return Container(
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: <Widget>[
+                        Center(child: CircularProgressIndicator()),
+                        GestureDetector(
+                          child: FadeInImage.memoryNetwork(
+                            placeholder: kTransparentImage,
+                            image: _uploadedFileURL[index],
+                            fit: BoxFit.fitWidth,
+                          ),
+                          onLongPress: () {
+                            _deletePhotos(index);
+                          },
+                          onHorizontalDragEnd: (sdfs) {
+                            _deletePhotos(index);
+                          },
+                        )
+                      ],
+                    ),
+                  );
+                })),
           ),
-        ),
-        floatingActionButton: FloatingActionButton.extended(
+        ],
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Patient Details'),
+        centerTitle: true,
+      ),
+      body: ModalProgressHUD(
+        inAsyncCall: showSpinner,
+        opacity: 0.8,
+        child: _getBody(),
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 50.0, right: 0.0),
+        child: FloatingActionButton.extended(
+          backgroundColor: Color(0xFFff1744),
           onPressed: () {
             _getImage();
           },
           label: Text('Add Photo'),
           icon: Icon(Icons.photo_camera),
         ),
-      );
-    }
+      ),
+    );
   }
 }

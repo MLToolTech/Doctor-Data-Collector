@@ -24,62 +24,59 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   void getUser() async {
     final user = await _auth.currentUser();
     if (user != null) {
-      Navigator.pushNamed(context, HomeScreen.id);
+      Navigator.pushReplacementNamed(context, HomeScreen.id);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Hero(
-                  tag: 'icon',
-                  child: Container(
-                    child: Icon(
-                      Icons.local_hospital,
-                      color: Colors.red,
-                      size: 60.0,
-                    ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Hero(
+                tag: 'icon',
+                child: Container(
+                  child: Icon(
+                    Icons.local_hospital,
+                    color: Colors.red,
+                    size: 60.0,
                   ),
                 ),
-                TypewriterAnimatedTextKit(
-                  totalRepeatCount: 4,
-                  speed: Duration(seconds: 1),
-                  text: ['Doctor app'],
-                  textStyle: TextStyle(
-                    fontSize: 45.0,
-                    fontWeight: FontWeight.w900,
-                  ),
+              ),
+              TypewriterAnimatedTextKit(
+                totalRepeatCount: 4,
+                speed: Duration(seconds: 1),
+                text: ['Doctor app'],
+                textStyle: TextStyle(
+                  fontSize: 45.0,
+                  fontWeight: FontWeight.w900,
                 ),
-              ],
-            ),
-            SizedBox(
-              height: 48.0,
-            ),
-            RoundedButton(
-              colour: Colors.lightBlueAccent,
-              title: 'Log In',
-              onPressed: () {
-                Navigator.pushNamed(context, LoginScreen.id);
-              },
-            ),
-            RoundedButton(
-              colour: Colors.blueAccent,
-              title: 'Register',
-              onPressed: () {
-                Navigator.pushNamed(context, RegistrationScreen.id);
-              },
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 48.0,
+          ),
+          RoundedButton(
+            colour: Colors.redAccent,
+            title: 'Log In',
+            onPressed: () {
+              Navigator.pushNamed(context, LoginScreen.id);
+            },
+          ),
+          RoundedButton(
+            colour: Color(0xFFff1744),
+            title: 'Register',
+            onPressed: () {
+              Navigator.pushNamed(context, RegistrationScreen.id);
+            },
+          ),
+        ],
       ),
     );
   }
