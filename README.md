@@ -1,16 +1,12 @@
-# doc_app
+# Doctor Data Collector
 
-A new Flutter application.
+A simple and elegent app that is used to collect the patient images. This app is available on playsore 
 
 ## Getting Started
+- Login with email and password.
+- Add patient with their Name and Phone number.
+- Now Collect Patient Images.
 
-This project is a starting point for a Flutter application.
+You can also do some other stuff like you can edit your profile and and delete the patient by long tap on it or by swiping image to right.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+At the end if you face any issue in app feel free to erase issue.
