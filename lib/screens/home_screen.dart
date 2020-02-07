@@ -33,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> patientArray = [];
   bool _showSpinner = false;
   dynamic imgUrl;
+  DocumentSnapshot docSnap;
 
   @override
   void initState() {
@@ -58,9 +59,14 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           uId = user;
           loggedInUser = user.email.toString();
+
           getPatient();
           //print(loggedInUser);
         });
+        docSnap = await databaseReference
+            .collection('patient')
+            .document(uId.uid)
+            .get();
         getPhotoFirebase();
       }
     } catch (e) {
