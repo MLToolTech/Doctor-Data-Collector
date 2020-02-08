@@ -45,9 +45,8 @@ class _SlashScreenState extends State<SlashScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Center(
-            child: Image.asset('assets/icon.png'),
-          ),
+          child:
+              Center(child: Image(image: AssetImage('assets/images/bb.png'))),
         ),
       ),
     );

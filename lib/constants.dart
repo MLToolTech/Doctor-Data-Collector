@@ -35,3 +35,10 @@ const kFieldDecoration = InputDecoration(
     borderRadius: BorderRadius.all(Radius.circular(32.0)),
   ),
 );
+
+const kDivider = Divider(
+  color: Colors.grey,
+  height: 10.0,
+  indent: 5.0,
+  endIndent: 5.0,
+);

@@ -1,3 +1,4 @@
+import 'package:doc_app/screens/about_us.dart';
 import 'package:doc_app/screens/login_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:path/path.dart' as Path;
 import 'package:doc_app/screens/patient_details.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:firebase_admob/firebase_admob.dart';
+import 'package:doc_app/constants.dart';
 
 final databaseReference = Firestore.instance;
 
@@ -383,12 +385,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.pushNamed(context, ProfileScreen.id);
               },
             ),
-            Divider(
-              color: Colors.grey,
-              height: 10.0,
-              indent: 5.0,
-              endIndent: 5.0,
+            kDivider,
+            ListTile(
+              title: Text('About us'),
+              leading: Icon(Icons.supervisor_account),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, AboutUs.id);
+              },
             ),
+            kDivider,
             ListTile(
               title: Text('Logout'),
               leading: Icon(Icons.cancel),
@@ -417,6 +423,6 @@ BannerAd myBanner = BannerAd(
   size: AdSize.banner,
   targetingInfo: targetingInfo,
   listener: (MobileAdEvent event) {
-    print("BannerAd event is $event");
+    //print("BannerAd event is $event");
   },
 );
