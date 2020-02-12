@@ -40,7 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+    FirebaseAdMob.instance
+        .initialize(appId: "ca-app-pub-8258387733686296~2371288299");
     myBanner
       ..load()
       ..show();
@@ -419,7 +420,7 @@ MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
 );
 
 BannerAd myBanner = BannerAd(
-  adUnitId: BannerAd.testAdUnitId,
+  adUnitId: "ca-app-pub-8258387733686296/5919651069",
   size: AdSize.banner,
   targetingInfo: targetingInfo,
   listener: (MobileAdEvent event) {
